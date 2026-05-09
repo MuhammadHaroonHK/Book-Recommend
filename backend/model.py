@@ -115,7 +115,27 @@ def recommend_books(book_name):
 
     try:
 
-        index = pivot_table.index.get_loc(book_name)
+        # =========================
+        # FIND MATCHING BOOK
+        # =========================
+
+        matching_books = [
+            title for title in pivot_table.index
+            if book_name.lower() in title.lower()
+        ]
+
+        # No match found
+        if len(matching_books) == 0:
+            return []
+
+        # Take first matching book
+        selected_book = matching_books[0]
+
+        # =========================
+        # FIND SIMILAR BOOKS
+        # =========================
+
+        index = pivot_table.index.get_loc(selected_book)
 
         similar_items = sorted(
             list(enumerate(similarity_scores[index])),
@@ -127,32 +147,25 @@ def recommend_books(book_name):
 
         for item in similar_items:
 
-            book_data = {}
-
             temp_df = books[
                 books['Book-Title'] == pivot_table.index[item[0]]
             ]
 
-            book_data['title'] = temp_df[
-                'Book-Title'
-            ].values[0]
-
-            book_data['author'] = temp_df[
-                'Book-Author'
-            ].values[0]
-
-            book_data['image'] = temp_df[
-                'Image-URL-M'
-            ].values[0]
+            book_data = {
+                "title": temp_df['Book-Title'].values[0],
+                "author": temp_df['Book-Author'].values[0],
+                "image": temp_df['Image-URL-M'].values[0]
+            }
 
             recommendations.append(book_data)
 
         return recommendations
 
-    except:
+    except Exception as e:
+
+        print("ERROR:", e)
+
         return []
-
-
 # =========================
 # TEST RECOMMENDATION
 # =========================
