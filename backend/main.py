@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from model import recommend_books
+from model import (
+    recommend_books,
+    search_books,
+    get_books,
+    get_top_rated_books
+)
 
 app = FastAPI()
 
@@ -35,9 +40,39 @@ def home():
 @app.get("/recommend/{book_name}")
 def recommend(book_name: str):
 
-    recommendations = recommend_books(book_name)
+    return {
+        "recommendations": recommend_books(book_name)
+    }
+
+# =========================
+# SEARCH API
+# =========================
+
+@app.get("/search/{query}")
+def search(query: str):
 
     return {
-        "book": book_name,
-        "recommendations": recommendations
+        "suggestions": search_books(query)
+    }
+
+# =========================
+# EXPLORE BOOKS API
+# =========================
+
+@app.get("/books")
+def books(page: int = 1):
+
+    return {
+        "books": get_books(page)
+    }
+
+# =========================
+# TOP RATED API
+# =========================
+
+@app.get("/top-rated")
+def top_rated():
+
+    return {
+        "books": get_top_rated_books()
     }
